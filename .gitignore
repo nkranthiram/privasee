@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Data directories
+data/uploads/*
+data/temp_images/*
+data/output/*
+
+# Keep directory structure
+!data/uploads/.gitkeep
+!data/temp_images/.gitkeep
+!data/output/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.egg
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
