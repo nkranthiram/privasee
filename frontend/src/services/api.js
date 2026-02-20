@@ -8,7 +8,7 @@ import axios from 'axios';
 // Create axios instance with base configuration
 const apiClient = axios.create({
   baseURL: '/api',
-  timeout: 60000, // 60 seconds for processing
+  // No global timeout — per-call timeouts are set below
   headers: {
     'Content-Type': 'application/json',
   },
@@ -37,6 +37,7 @@ export const uploadPdf = async (file) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    timeout: 120000, // 2 min — upload + image extraction for large PDFs
   });
 
   return response.data;
@@ -52,6 +53,8 @@ export const processDocument = async (sessionId, fieldDefinitions) => {
   const response = await apiClient.post('/process', {
     session_id: sessionId,
     field_definitions: fieldDefinitions,
+  }, {
+    timeout: 900000, // 15 min — OCR + Claude per page, up to ~30 pages
   });
 
   return response.data;
@@ -69,6 +72,8 @@ export const approveAndMask = async (sessionId, approvedEntityIds, updatedEntiti
     session_id: sessionId,
     approved_entity_ids: approvedEntityIds,
     updated_entities: updatedEntities,
+  }, {
+    timeout: 300000, // 5 min — masking all pages + PDF assembly
   });
 
   return response.data;
