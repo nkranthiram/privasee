@@ -108,6 +108,88 @@ export const healthCheck = async () => {
   return response.data;
 };
 
+// ─── Strategy & Config API ────────────────────────────────────────────────────
+
+/**
+ * List all available system strategy templates
+ * @returns {Promise<{templates: Array}>}
+ */
+export const getSystemTemplates = async () => {
+  const response = await apiClient.get('/strategies/system');
+  return response.data;
+};
+
+/**
+ * Get a specific system template by name
+ * @param {string} templateName
+ * @returns {Promise<Object>} Template with fields
+ */
+export const getSystemTemplate = async (templateName) => {
+  const response = await apiClient.get(`/strategies/system/${encodeURIComponent(templateName)}`);
+  return response.data;
+};
+
+/**
+ * Save the current field configuration to the backend user_configs folder
+ * @param {string} configName - Name for the saved config
+ * @param {Array} fields - Array of field definitions
+ * @returns {Promise<Object>}
+ */
+export const saveUserConfig = async (configName, fields) => {
+  const response = await apiClient.post('/configs', { config_name: configName, fields });
+  return response.data;
+};
+
+/**
+ * List all saved user configurations
+ * @returns {Promise<{configs: Array}>}
+ */
+export const listUserConfigs = async () => {
+  const response = await apiClient.get('/configs');
+  return response.data;
+};
+
+/**
+ * Load a specific saved user configuration by name
+ * @param {string} configName
+ * @returns {Promise<Object>} Config with fields
+ */
+export const getUserConfig = async (configName) => {
+  const response = await apiClient.get(`/configs/${encodeURIComponent(configName)}`);
+  return response.data;
+};
+
+// ─── Batch Processing API ─────────────────────────────────────────────────────
+
+/**
+ * Scan a local folder and return eligible PDF filenames
+ * @param {string} folderPath - Absolute path to the folder
+ * @returns {Promise<{folder_path: string, pdf_files: string[], count: number}>}
+ */
+export const scanBatchFolder = async (folderPath) => {
+  // POST with JSON body to avoid URL encoding issues with path separators
+  const response = await apiClient.post('/batch/scan', { folder_path: folderPath }, {
+    timeout: 10000,
+  });
+  return response.data;
+};
+
+/**
+ * Process all PDFs in a local folder through the full de-identification pipeline
+ * @param {string} folderPath - Absolute path to the folder
+ * @param {Array} fieldDefinitions - Field definitions from ConfigPanel
+ * @returns {Promise<BatchResponse>}
+ */
+export const processBatch = async (folderPath, fieldDefinitions) => {
+  const response = await apiClient.post('/batch', {
+    folder_path: folderPath,
+    field_definitions: fieldDefinitions,
+  }, {
+    timeout: 1800000, // 30 min — large batches can take time
+  });
+  return response.data;
+};
+
 /**
  * Get file URL
  * @param {string} folder - Folder name (uploads, temp_images, output)
@@ -136,4 +218,11 @@ export default {
   healthCheck,
   getFileUrl,
   buildFileUrl,
+  getSystemTemplates,
+  getSystemTemplate,
+  saveUserConfig,
+  listUserConfigs,
+  getUserConfig,
+  scanBatchFolder,
+  processBatch,
 };

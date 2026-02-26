@@ -20,6 +20,7 @@ class FieldDefinition(BaseModel):
     name: str = Field(..., description="Name of the field (e.g., 'Full Name')")
     description: str = Field(..., description="Description to help identify the field")
     strategy: ReplacementStrategy = Field(..., description="How to replace this field")
+    source: Optional[str] = Field(default="custom", description="Origin of the field: 'system' or 'custom'")
 
     @field_validator('name')
     @classmethod
@@ -174,3 +175,78 @@ class HealthResponse(BaseModel):
         default_factory=dict,
         description="Status of dependent services"
     )
+
+
+class TemplateInfo(BaseModel):
+    """Summary info about a system strategy template."""
+    template_name: str
+    description: str
+    version: str
+    field_count: int
+
+
+class SystemTemplate(BaseModel):
+    """Full system strategy template with fields."""
+    template_name: str
+    description: str
+    version: str
+    fields: List[FieldDefinition]
+
+
+class ScanRequest(BaseModel):
+    """Request to scan a folder for eligible PDF files."""
+    folder_path: str = Field(..., description="Absolute path to the folder to scan")
+
+
+class BatchRequest(BaseModel):
+    """Request to process a batch of PDFs from a local folder."""
+    folder_path: str = Field(..., description="Absolute path to the folder containing PDFs")
+    field_definitions: List[FieldDefinition] = Field(..., min_length=1)
+
+    @field_validator('folder_path')
+    @classmethod
+    def path_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Folder path cannot be empty')
+        return v.strip()
+
+
+class BatchDocumentResult(BaseModel):
+    """Per-document result from batch processing."""
+    filename: str
+    masked_filename: str
+    status: str = Field(..., description="'success' or 'error'")
+    entities_to_mask: int = 0
+    entities_masked: int = 0
+    score: float = 0.0
+    error: Optional[str] = None
+
+
+class BatchResponse(BaseModel):
+    """Response after processing a full batch."""
+    output_folder: str
+    total_documents: int
+    successful_documents: int
+    batch_score: float
+    results: List[BatchDocumentResult]
+
+
+class UserConfigSaveRequest(BaseModel):
+    """Request to save a user configuration."""
+    config_name: str = Field(..., description="Name for the saved configuration")
+    fields: List[FieldDefinition] = Field(..., description="Field definitions to save")
+
+    @field_validator('config_name')
+    @classmethod
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Config name cannot be empty')
+        return v.strip()
+
+
+class UserConfigInfo(BaseModel):
+    """Summary info about a saved user configuration."""
+    config_name: str
+    filename: str
+    field_count: int
+    created_at: str
