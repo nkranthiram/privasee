@@ -1,0 +1,27 @@
+{
+  "template_name": "Common PII",
+  "description": "Standard fields for Australian healthcare document de-identification",
+  "version": "1.0",
+  "fields": [
+    {
+      "name": "Full Name",
+      "description": "Patient or person's full name, including first and last name and any middle names",
+      "strategy": "Fake Data"
+    },
+    {
+      "name": "Date of Birth",
+      "description": "Date of birth in any format (e.g., 01/01/1980, 1 January 1980, DOB: 01-01-1980)",
+      "strategy": "Fake Data"
+    },
+    {
+      "name": "Medicare Number",
+      "description": "Australian Medicare card number, typically 10-11 digits, sometimes with a reference number suffix",
+      "strategy": "Black Out"
+    },
+    {
+      "name": "Physical Address",
+      "description": "Full residential or mailing address including street number, street name, suburb, state, and postcode",
+      "strategy": "Fake Data"
+    }
+  ]
+}
